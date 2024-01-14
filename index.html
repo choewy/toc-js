@@ -5,8 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ToC Maker</title>
-  <script src="./index.js"></script>
-  <script>
+  <script type="module">
+    import ToCRenderer from './src/index.js'
+
     let visible = false;
     let buttonText = 'Create';
 
@@ -26,13 +27,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('#btn_toc').textContent = buttonText
-      document.querySelector('#btn_toc').addEventListener('onclick', onClick)
+      document.querySelector('#btn_toc').onclick = onClick
     });
   </script>
 </head>
 
 <body>
-  <button id="btn_toc" onclick="onClick()"></button>
+  <button id="btn_toc"></button>
   <div id="toc"></div>
   <div>
     <h1>1. h1</h1>
