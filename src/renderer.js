@@ -1,26 +1,28 @@
 import { Content } from './content.js';
 
 export class ToCRenderer {
-  id;
+  ref;
+  element;
   depth;
 
-  constructor(id, depth) {
-    this.id = id;
-    this.depth = depth ?? 6;
+  constructor(
+    ref = document.createElement('div'),
+    element = document.querySelector('body'),
+    depth = 6,
+  ) {
+    this.ref = ref;
+    this.element = element;
+    this.depth = depth;
+
+    this.element.prepend(ref);
   }
 
   #extractElements(elements, node, content) {
     const tagName = node.tagName ?? '';
     const depth = Number(tagName.replace('H', ''));
 
-    if (node.children.length === 0) {
-      if (tagName.startsWith('H')) {
-        if (depth <= this.depth) {
-          elements.push(node);
-        }
-      }
-
-      return;
+    if (Number.isNaN(depth) === false && depth <= this.depth) {
+      elements.push(node);
     }
 
     for (const child of node.children) {
@@ -98,16 +100,6 @@ export class ToCRenderer {
   }
 
   #renderContents(contents) {
-    const body = document.querySelector('body');
-
-    let div = document.getElementById(this.id);
-
-    if (div == null) {
-      div = document.createElement('div');
-      div.id = this.id;
-      body.prepend(div);
-    }
-
     const h1 = document.createElement('h1');
     const ul = document.createElement('ul');
     const hr = document.createElement('hr');
@@ -128,30 +120,23 @@ export class ToCRenderer {
     ul.style.listStyle = 'none';
 
     ul.append(...li);
-    div.append(h1, ul, hr);
+    this.ref.append(h1, ul, hr);
   }
 
   render() {
     const elements = [];
     const contents = [];
-    const body = document.querySelector('body');
 
-    this.#extractElements(elements, body, null);
+    this.#extractElements(elements, this.element, null);
     this.#createContents(elements, contents);
     this.#renderContents(contents);
   }
 
   remove() {
-    const div = document.getElementById(this.id);
-
-    if (div == null) {
-      return;
-    }
-
-    const children = Array.from(div.childNodes);
+    const children = Array.from(this.ref.childNodes);
 
     while (children.length > 0) {
-      div.removeChild(children.pop());
+      this.ref.removeChild(children.pop());
     }
   }
 }
