@@ -42,17 +42,22 @@ class Content {
 
 class ToCRenderer {
   id;
+  depth;
 
-  constructor(id) {
+  constructor(id, depth) {
     this.id = id;
+    this.depth = depth ?? 6;
   }
 
   #extractElements(elements, node, content) {
     const tagName = node.tagName ?? '';
+    const depth = Number(tagName.replace('H', ''));
 
     if (node.children.length === 0) {
       if (tagName.startsWith('H')) {
-        elements.push(node);
+        if (depth <= this.depth) {
+          elements.push(node);
+        }
       }
 
       return;
@@ -69,11 +74,12 @@ class ToCRenderer {
     while (elements.length > 0) {
       const element = elements.shift();
 
-      const id = element.textContent.replaceAll('.', '_').replaceAll(' ', '_');
-      const depth = Number(element.tagName.replace('H', ''));
-      const current = new Content(id, depth, element.textContent);
+      element.id = element.textContent
+        .replaceAll('.', '_')
+        .replaceAll(' ', '_');
 
-      element.id = id;
+      const depth = Number(element.tagName.replace('H', ''));
+      const current = new Content(element.id, depth, element.textContent);
 
       if (last === null) {
         last = current;
