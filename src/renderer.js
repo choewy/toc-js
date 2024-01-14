@@ -64,7 +64,7 @@ export class ToCRenderer {
       }
 
       if (last.depth > current.depth) {
-        const parent = last.findParentByDepth(current.depth);
+        const parent = last.findParentOrderThanCurrentDepth(current.depth);
 
         if (parent) {
           parent.appendChild(current);

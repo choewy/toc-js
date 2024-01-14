@@ -25,7 +25,7 @@ export class Content {
     return this;
   }
 
-  findParentByDepth(depth) {
+  findParentOrderThanCurrentDepth(depth) {
     let parent = this;
 
     while (parent) {
