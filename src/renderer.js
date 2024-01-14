@@ -3,18 +3,19 @@ import { Content } from './content.js';
 export class ToCRenderer {
   ref;
   element;
+  title;
   depth;
 
   constructor(
     ref = document.createElement('div'),
     element = document.querySelector('body'),
+    title = 'Table of Contents',
     depth = 6,
   ) {
     this.ref = ref;
     this.element = element;
+    this.title = title;
     this.depth = depth;
-
-    this.element.prepend(ref);
   }
 
   #extractElements(elements, node, content) {
@@ -30,7 +31,7 @@ export class ToCRenderer {
     }
   }
 
-  #createContents(elements, contents) {
+  createContents(elements, contents) {
     let last = null;
 
     while (elements.length > 0) {
@@ -41,44 +42,46 @@ export class ToCRenderer {
         .replaceAll(' ', '_');
 
       const depth = Number(element.tagName.replace('H', ''));
-      const current = new Content(element.id, depth, element.textContent);
+      const content = new Content(element.id, depth, element.textContent);
 
       if (last === null) {
-        last = current;
+        last = content;
         contents.push(last);
         continue;
       }
 
-      if (last.depth === current.depth) {
+      if (last.depth === content.depth) {
         if (last.parent) {
-          last.parent.appendChild(current);
-          last = current.setParent(last.parent);
+          last.parent.appendChild(content);
+          last = content.setParent(last.parent);
 
           continue;
         }
       }
 
-      if (last.depth < current.depth) {
-        last.appendChild(current);
-        last = current.setParent(last);
+      if (last.depth < content.depth) {
+        last.appendChild(content);
+        last = content.setParent(last);
 
         continue;
       }
 
-      if (last.depth > current.depth) {
-        const parent = last.findParentOrderThanCurrentDepth(current.depth);
+      if (last.depth > content.depth) {
+        const parent = last.findParentOrderThanCurrentDepth(content.depth);
 
         if (parent) {
-          parent.appendChild(current);
-          last = current.setParent(parent);
+          parent.appendChild(content);
+          last = content.setParent(parent);
 
           continue;
         }
       }
 
-      last = current;
+      last = content;
       contents.push(last);
     }
+
+    return contents;
   }
 
   #contentToElement(elements, content) {
@@ -115,7 +118,7 @@ export class ToCRenderer {
       this.#contentToElement(li, content);
     }
 
-    h1.innerText = 'Table Of Contents';
+    h1.innerText = this.title;
     ul.style.padding = 0;
     ul.style.listStyle = 'none';
 
@@ -128,7 +131,7 @@ export class ToCRenderer {
     const contents = [];
 
     this.#extractElements(elements, this.element, null);
-    this.#createContents(elements, contents);
+    this.createContents(elements, contents);
     this.#renderContents(contents);
   }
 
