@@ -33,30 +33,19 @@
   </style>
   <script src="./src/index.js"></script>
   <script>
+    let tocMaker = null;
     let visible = false;
     let buttonText = 'Create';
 
-
     const onClick = () => {
-      const toc = document.querySelector('#toc')
-      const article = document.querySelector('#article')
-
-      if (toc == null || article == null) {
+      if (tocMaker === null) {
         return
       }
 
       if (visible === false) {
-        renderTableOfContents(toc, article, 'Table of Contents', {
-          padding: '20px',
-          backgroundColor: '#f6f8fa',
-          borderRadius: '0.5rem'
-        })
+        tocMaker.render()
       } else {
-        const children = Array.from(toc.childNodes);
-
-        while (children.length > 0) {
-          toc.removeChild(children.pop());
-        }
+        tocMaker.remove()
       }
 
       visible = !visible
@@ -65,6 +54,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      tocMaker = TocMaker.init(
+        document.querySelector('#toc'),
+        document.querySelector('#article'), 'Table of Contents',
+        {
+          padding: '20px',
+          backgroundColor: '#f6f8fa',
+          borderRadius: '0.5rem'
+        })
+
       document.querySelector('#btn_toc').textContent = buttonText
       document.querySelector('#btn_toc').onclick = onClick
     });
