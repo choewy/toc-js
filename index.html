@@ -31,21 +31,32 @@
       gap: 10px;
     }
   </style>
-  <script type="module">
-    import ToCRenderer from './src/index.js'
-
+  <script src="./src/index.js"></script>
+  <script>
     let visible = false;
     let buttonText = 'Create';
 
-    const ref = document.querySelector('#toc')
-    const article = document.querySelector('#article')
-    const tocRenderer = new ToCRenderer(ref, article, 'Table of Contents', 3)
 
     const onClick = () => {
+      const toc = document.querySelector('#toc')
+      const article = document.querySelector('#article')
+
+      if (toc == null || article == null) {
+        return
+      }
+
       if (visible === false) {
-        tocRenderer.render()
+        renderTableOfContents(toc, article, 'Table of Contents', {
+          padding: '20px',
+          backgroundColor: '#f6f8fa',
+          borderRadius: '0.5rem'
+        })
       } else {
-        tocRenderer.remove()
+        const children = Array.from(toc.childNodes);
+
+        while (children.length > 0) {
+          toc.removeChild(children.pop());
+        }
       }
 
       visible = !visible
